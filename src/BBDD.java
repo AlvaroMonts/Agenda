@@ -49,6 +49,73 @@ public class BBDD {
 
 	}
 
+	public boolean insertarUsuario(String nombre, String pass) {
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
+			String sql = "INSERT INTO implementacion.usuarios (nombre,pass) VALUES (?,?)";
+			PreparedStatement psts = con.prepareStatement(sql);
+			psts.setString(1, nombre);
+			psts.setString(2, pass);
+			psts.executeUpdate();
+			psts.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public boolean comprobarUserReg(String nombre) {
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT nombre FROM implementacion.usuarios");
+			while (rs.next()) {
+				String nombreBBDD = rs.getString("nombre");
+				if (nombre.equals(nombreBBDD)) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public boolean modificarContacto(String nombre, int numero, String email, int id, String apellidos) {
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
+			String sql = "UPDATE implementacion.personas SET nombre='" + nombre + "', numerotlf='" + numero
+					+ "', email='" + email + "', apellidos='" + apellidos + "' WHERE id='" + id + "';";
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate(sql);
+			stmt.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	public boolean borrarcontacto(int id) {
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
+			String query = "DELETE FROM implementacion.personas WHERE id='" + id + "';";
+			PreparedStatement psts = con.prepareStatement(query);
+			psts.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public boolean insertarContacto(String nombre, int tlf, String email, String apellidos) {
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
@@ -67,7 +134,6 @@ public class BBDD {
 			e.printStackTrace();
 			return false;
 		}
-
 	}
 
 	public ArrayList<String> verContactos() {
@@ -93,37 +159,30 @@ public class BBDD {
 			e.printStackTrace();
 		}
 		return personas;
-
 	}
-
-	public boolean borrarcontacto(int id) {
+	
+	public ArrayList<String> verContactos(String nombre) {
+		ArrayList<String> personas = new ArrayList<>();
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
-			String query = "DELETE FROM implementacion.personas WHERE id='" + id + "';";
-			PreparedStatement psts = con.prepareStatement(query);
-			psts.executeUpdate();
-			return true;
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM implementacion.personas where idUser = " + id + " and nombre = '" + nombre + "';");
+			while (rs.next()) {
+				String nom = rs.getString("nombre");
+				int tlf = rs.getInt("numerotlf");
+				String email = rs.getString("email");
+				String ape = rs.getString("apellidos");
+				int id = rs.getInt("id");
+				personas.add(nom + " ");
+				personas.add(ape + " ");
+				personas.add(tlf + " ");
+				personas.add(email + " ");
+				personas.add("id=" + id + "\n");
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
 		}
+		return personas;
 	}
-
-	public boolean modificarContacto(String nombre, int numero, String email, int id, String apellidos) {
-		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost/implementacion", "root", "");
-			String sql = "UPDATE implementacion.personas SET nombre='" + nombre + "', numerotlf='" + numero
-					+ "', email='" + email + "', apellidos='" + apellidos + "' WHERE id='" + id + "';";
-			Statement stmt = con.createStatement();
-			stmt.executeUpdate(sql);
-			stmt.close();
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-	}
-
 }
